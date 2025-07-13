@@ -1,11 +1,58 @@
-# Sample Snack app
+🕌 Mapa Muzułmańska w Polsce – aplikacja tworzona jako sadaqa jariya
+To projekt tworzony przez społeczność, dla społeczności. Naszym celem jest stworzenie darmowej aplikacji dla muzułmanów mieszkających w Polsce, która pomoże im znaleźć:
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
+🕌 meczety i miejsca modlitwy
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
+🛍️ sklepy halal i z dostawą
 
-All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
+💇‍♀️ fryzjerów przyjaznych hijabi
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
+🥩 dostawy mięsa halal
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
+📦 sklepy online z odzieżą i produktami dla muzułmanów
+
+💬 możliwość komentowania i oceniania miejsc przez społeczność
+
+Chcemy, żeby korzystanie z niej było łatwe i piękne — bez reklam, bez opłat, bez rejestracji. Po prostu wspólna pomoc i sadaqa jariya.
+
+🔧 Potrzebujemy pomocy!
+Nie jestem programistką – buduję to sercem i z pomocą sztucznej inteligencji.
+Jeśli umiesz programować, znasz React Native, Expo, Firebase, Google Sheets lub po prostu chcesz pomóc – dołącz do projektu!
+
+Zależy nam też na wsparciu od osób, które:
+
+mają dane o muzułmańskich miejscach w Polsce
+
+potrafią tłumaczyć
+
+chcą testować aplikację
+
+🇬🇧 English
+🕌 Muslim Map of Poland – a sadaqa jariya community project
+This is a community-built, heart-driven project. Our goal is to build a free mobile app for Muslims in Poland, helping them easily find:
+
+🕌 mosques and prayer spaces
+
+🛍️ halal-friendly shops and delivery
+
+💇‍♀️ hijabi-friendly hairdressers
+
+🥩 halal meat delivery services
+
+📦 online stores for modest clothing and Islamic goods
+
+💬 a way for the community to leave comments and reviews
+
+We want it to be simple, beautiful and accessible — no ads, no logins, no costs. Just barakah and sadaqa jariya.
+
+🔧 We need your help!
+I'm not a developer — this is built with heart and help from AI.
+If you know React Native, Expo, Firebase, Google Sheets or simply want to help, please join us!
+
+We’re also looking for people who:
+
+can provide data about Muslim-friendly places in Poland
+
+can help with translations
+
+want to test the app
