@@ -7,9 +7,9 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  Pressable,
+  Pressable, FlatList,
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, {Callout, CalloutSubview, Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as Papa from 'papaparse';
 import { Picker } from '@react-native-picker/picker';
@@ -17,6 +17,8 @@ import { getDistance } from 'geolib';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 
 const csvUrl =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRXOGFWmvUFgJOYffY8arFpHltMm7HUcU2kfQx4lTz-ydft6PBFqKq6Oci9SdejhmvoAJppEApG3Lfn/pub?gid=1462335138&single=true&output=csv';
@@ -148,29 +150,43 @@ export default function App() {
         {filteredPlaces.map((place, index) => {
           const style = categoryStyle[place.Category] || { emoji: '📍' };
           return (
-            <Marker //pin
-              key={index}
-              coordinate={{
-                latitude: place.Latitude,
-                longitude: place.Longitude,
-              }}
-              onPress={() => {
-                const url = `https://www.google.com/maps?q=${place.Latitude},${place.Longitude}(${encodeURIComponent(place.Name)})`;
-                Linking.openURL(url);
-              }}
-              title={`${style.emoji} ${place.Name}`}
-              pinColor={`${categoryStyle[place.Category]?.color}`}
-            />
+              <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: place.Latitude,
+                    longitude: place.Longitude,
+                  }}
+                  title={place.Name}
+                  pinColor={categoryStyle[place.Category]?.color}
+                  onCalloutPress={() => {
+                    const url = `https://www.google.com/maps?q=${place.Latitude},${place.Longitude}(${encodeURIComponent(place.Name)})`;
+                    Linking.openURL(url);
+                  }}
+              >
+                <Callout tooltip>
+                  <View style={styles.calloutContainer}>
+                    <Text style={styles.calloutText}>
+                      {`${style.emoji} ${place.Name}`}
+                    </Text>
+                    <View style={styles.mapButton}>
+                      <Text style={style.calloutText}>Go to Maps</Text>
+                      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name="map" size={24} color="#4285F4" />
+                      </View>
+                    </View>
+                  </View>
+                </Callout>
+              </Marker>
           );
         })}
       </MapView>
 
       {/* Filters & List */}
-      <ScrollView style={styles.filters}>
+      <View style={styles.filters}>
         <Text style={styles.label}>Filtruj według kategorii:</Text>
         <Picker
-          selectedValue={categoryFilter}
-          onValueChange={(value) => setCategoryFilter(value)}
+            selectedValue={categoryFilter}
+            onValueChange={(value) => setCategoryFilter(value)}
         >
           <Picker.Item label="Wszystkie" value="" />
           {Object.entries(categoryStyle).map(([key, style]) => (
@@ -186,36 +202,44 @@ export default function App() {
         <Text style={styles.label}>
           {showFavourites ? 'Ulubione miejsca:' : 'Lista miejsc:'}
         </Text>
-        {filteredPlaces.map((place, index) => {
-          const style = categoryStyle[place.Category] || {};
-          const distanceStr =
-            place.distance !== undefined
-              ? ` (${place.distance.toFixed(1)} km)`
-              : '';
-          const isFav = favourites.includes(place.Name);
 
-          return (
-            <View key={index} style={styles.listItem}>
-              <View style={styles.textContainer}>
-                <Text style={styles.placeName}
-                onPress={() => {
-                  const url = `https://www.google.com/maps?q=${place.Latitude},${place.Longitude}(${encodeURIComponent(place.Name)})`;
-                  Linking.openURL(url);
-                }}>
-                  {style.emoji} {place.Name}
-                </Text>
-                <Text style={{ color: '#666' }}>
-                  {place.Category}
-                  {distanceStr}
-                </Text>
-              </View>
-              <TouchableOpacity onPress={() => toggleFavourite(place.Name)}>
-                <Text style={{ fontSize: 20 }}>{isFav ? '⭐' : '☆'}</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </ScrollView>
+        <FlatList
+            data={filteredPlaces}
+            keyExtractor={(item, index) => `${item.Name}-${index}`}
+            renderItem={({ item }) => {
+              const style = categoryStyle[item.Category] || {};
+              const distanceStr =
+                  item.distance !== undefined
+                      ? ` (${item.distance.toFixed(1)} km)`
+                      : '';
+              const isFav = favourites.includes(item.Name);
+
+              return (
+                  <View style={styles.listItem}>
+                    <View style={styles.textContainer}>
+                      <Text
+                          style={styles.placeName}
+                          onPress={() => {
+                            const url = `https://www.google.com/maps?q=${item.Latitude},${item.Longitude}(${encodeURIComponent(item.Name)})`;
+                            Linking.openURL(url);
+                          }}
+                      >
+                        {style.emoji} {item.Name}
+                      </Text>
+                      <Text style={{ color: '#666' }}>
+                        {item.Category}
+                        {distanceStr}
+                      </Text>
+                    </View>
+                    <TouchableOpacity onPress={() => toggleFavourite(item.Name)}>
+                      <Text style={{ fontSize: 20 }}>{isFav ? '⭐' : '☆'}</Text>
+                    </TouchableOpacity>
+                  </View>
+              );
+            }}
+        />
+      </View>
+
 
       {/* Modal Menu */}
       <Modal
@@ -356,5 +380,23 @@ const styles = StyleSheet.create({
   suggestionButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  calloutContainer: {
+    width: 180,
+    padding: 8,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 4,
+  },
+  calloutText: {
+    fontWeight: 'bold',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  mapButton: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: '#f0f0f0',
   },
 });
