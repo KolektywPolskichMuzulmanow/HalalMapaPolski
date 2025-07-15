@@ -22,10 +22,10 @@ const csvUrl =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vRXOGFWmvUFgJOYffY8arFpHltMm7HUcU2kfQx4lTz-ydft6PBFqKq6Oci9SdejhmvoAJppEApG3Lfn/pub?gid=1462335138&single=true&output=csv';
 
 const categoryStyle = {
-  Meczet: { emoji: '🕌' },
-  Sklep: { emoji: '🛒' },
-  Restauracja: { emoji: '🥘' },
-  Cmentarz: { emoji: '🪦' },
+  Meczet: { emoji: '🕌', color: '#0E76A8' },
+  Sklep: { emoji: '🛒', color: '#28A745' },
+  Restauracja: { emoji: '🥘', color: '#E67E22' },
+  Cmentarz: { emoji: '🪦', color: '#6C757D' },
 };
 
 export default function App() {
@@ -148,13 +148,18 @@ export default function App() {
         {filteredPlaces.map((place, index) => {
           const style = categoryStyle[place.Category] || { emoji: '📍' };
           return (
-            <Marker
+            <Marker //pin
               key={index}
               coordinate={{
                 latitude: place.Latitude,
                 longitude: place.Longitude,
               }}
+              onPress={() => {
+                const url = `https://www.google.com/maps?q=${place.Latitude},${place.Longitude}(${encodeURIComponent(place.Name)})`;
+                Linking.openURL(url);
+              }}
               title={`${style.emoji} ${place.Name}`}
+              pinColor={`${categoryStyle[place.Category]?.color}`}
             />
           );
         })}
@@ -168,10 +173,14 @@ export default function App() {
           onValueChange={(value) => setCategoryFilter(value)}
         >
           <Picker.Item label="Wszystkie" value="" />
-          <Picker.Item label="Meczet" value="Meczet" />
-          <Picker.Item label="Restauracja" value="Restauracja" />
-          <Picker.Item label="Sklep" value="Sklep" />
-          <Picker.Item label="Cmentarz" value="Cmentarz" />
+          {Object.entries(categoryStyle).map(([key, style]) => (
+              <Picker.Item
+                  key={key}
+                  label={`${style.emoji} ${key}`}
+                  value={key}
+                  backgroundColor={style.color}
+              />
+          ))}
         </Picker>
 
         <Text style={styles.label}>
@@ -188,7 +197,11 @@ export default function App() {
           return (
             <View key={index} style={styles.listItem}>
               <View style={styles.textContainer}>
-                <Text style={styles.placeName}>
+                <Text style={styles.placeName}
+                onPress={() => {
+                  const url = `https://www.google.com/maps?q=${place.Latitude},${place.Longitude}(${encodeURIComponent(place.Name)})`;
+                  Linking.openURL(url);
+                }}>
                   {style.emoji} {place.Name}
                 </Text>
                 <Text style={{ color: '#666' }}>
