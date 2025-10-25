@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   Dimensions,
   TouchableOpacity,
   Modal,
@@ -28,6 +28,9 @@ const categoryStyle = {
   Cmentarz: { emoji: '🪦' },
 };
 
+const DEFAULT_ITEM_HEIGHT = 84;
+const LIST_BOTTOM_PADDING = 16;
+
 export default function App() {
   const [places, setPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
@@ -39,8 +42,49 @@ export default function App() {
 
   const FAV_KEY = 'favouritesList';
 
+  const mapRef = useRef(null);
+  const listRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [pinnedPlace, setPinnedPlace] = useState(null); // NEW: show single place when set
+
+  // Dynamic layout tracking (kept for full list mode)
+  const itemHeights = useRef({});
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [listHeight, setListHeight] = useState(0);
+
+  const focusMapOn = (lat, lon) => {
+    if (!mapRef.current) return;
+    if (mapRef.current.animateCamera) {
+      mapRef.current.animateCamera(
+        { center: { latitude: lat, longitude: lon }, zoom: 14 },
+        { duration: 500 }
+      );
+    } else {
+      mapRef.current.animateToRegion(
+        { latitude: lat, longitude: lon, latitudeDelta: 0.03, longitudeDelta: 0.03 },
+        500
+      );
+    }
+  };
+
+  const getCumulativeHeight = (index) => {
+    let sum = 0;
+    for (let i = 0; i <= index; i++) {
+      const h = itemHeights.current[i];
+      sum += typeof h === 'number' ? h : DEFAULT_ITEM_HEIGHT;
+    }
+    return sum;
+  };
+
+  const focusListOnIndex = (index) => {
+    if (!listRef.current || typeof index !== 'number') return;
+    const cumulative = getCumulativeHeight(index);
+    let target = headerHeight + cumulative - listHeight + LIST_BOTTOM_PADDING;
+    if (target < 0) target = 0;
+    listRef.current.scrollToOffset({ offset: target, animated: true });
+  };
+
   useEffect(() => {
-    // Load user location
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
@@ -49,7 +93,6 @@ export default function App() {
       }
     })();
 
-    // Fetch CSV
     Papa.parse(csvUrl, {
       download: true,
       header: true,
@@ -68,16 +111,13 @@ export default function App() {
       },
     });
 
-    // Load favourites from storage
     loadFavourites();
   }, []);
 
   const loadFavourites = async () => {
     try {
       const stored = await AsyncStorage.getItem(FAV_KEY);
-      if (stored) {
-        setFavourites(JSON.parse(stored));
-      }
+      if (stored) setFavourites(JSON.parse(stored));
     } catch (e) {
       console.error('Failed to load favourites:', e);
     }
@@ -95,7 +135,6 @@ export default function App() {
     const updated = favourites.includes(name)
       ? favourites.filter((n) => n !== name)
       : [...favourites, name];
-
     setFavourites(updated);
     saveFavourites(updated);
   };
@@ -105,9 +144,7 @@ export default function App() {
       ? places.filter((p) => favourites.includes(p.Name))
       : places;
 
-    if (categoryFilter) {
-      data = data.filter((p) => p.Category === categoryFilter);
-    }
+    if (categoryFilter) data = data.filter((p) => p.Category === categoryFilter);
 
     if (userLocation) {
       data = data
@@ -122,20 +159,74 @@ export default function App() {
     }
 
     setFilteredPlaces(data);
+
+    // If pinned place no longer exists in filtered set, clear pin
+    if (pinnedPlace && !data.some((d) => d.Name === pinnedPlace.Name)) {
+      setPinnedPlace(null);
+    }
+    // Reset measured heights for full list mode
+    itemHeights.current = {};
   }, [categoryFilter, places, userLocation, favourites, showFavourites]);
+
+  const ListHeader = () => (
+    <View
+      style={styles.headerWrap}
+      onLayout={({ nativeEvent }) => setHeaderHeight(nativeEvent.layout.height)}
+    >
+      <Text style={styles.label}>Filtruj według kategorii:</Text>
+      <Picker selectedValue={categoryFilter} onValueChange={(v) => setCategoryFilter(v)}>
+        <Picker.Item label="Wszystkie" value="" />
+        <Picker.Item label="Meczet" value="Meczet" />
+        <Picker.Item label="Restauracja" value="Restauracja" />
+        <Picker.Item label="Sklep" value="Sklep" />
+        <Picker.Item label="Cmentarz" value="Cmentarz" />
+      </Picker>
+      <Text style={styles.label}>{showFavourites ? 'Ulubione miejsca:' : 'Lista miejsc:'}</Text>
+    </View>
+  );
+
+  const SingleCard = () => {
+    if (!pinnedPlace) return null;
+    const isFav = favourites.includes(pinnedPlace.Name);
+    const emoji = categoryStyle[pinnedPlace.Category]?.emoji ?? '📍';
+    const distanceStr =
+      pinnedPlace.distance !== undefined ? ` (${pinnedPlace.distance.toFixed(1)} km)` : '';
+    return (
+      <View style={styles.listContent}>
+        <TouchableOpacity style={styles.backButton} onPress={() => setPinnedPlace(null)}>
+          <Text style={styles.backButtonText}>← Pokaż wszystkie</Text>
+        </TouchableOpacity>
+        <View style={[styles.listItem, styles.listItemSelected]}>
+          <View style={styles.textContainer}>
+            <Text style={styles.placeName} numberOfLines={1} ellipsizeMode="tail">
+              {emoji} {pinnedPlace.Name}
+            </Text>
+            <Text style={{ color: '#666' }} numberOfLines={2} ellipsizeMode="tail">
+              {pinnedPlace.Category}
+              {distanceStr}
+            </Text>
+            {pinnedPlace.Address ? (
+              <Text style={{ color: '#666' }} numberOfLines={2} ellipsizeMode="tail">
+                {pinnedPlace.Address}
+              </Text>
+            ) : null}
+          </View>
+          <TouchableOpacity onPress={() => toggleFavourite(pinnedPlace.Name)}>
+            <Text style={{ fontSize: 20 }}>{isFav ? '⭐' : '☆'}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {/* Menu Button */}
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={() => setMenuVisible(true)}
-      >
+      <TouchableOpacity style={styles.menuButton} onPress={() => setMenuVisible(true)}>
         <Ionicons name="menu" size={28} color="#000" />
       </TouchableOpacity>
 
-      {/* Map */}
       <MapView
+        ref={mapRef}
         style={styles.map}
         initialRegion={{
           latitude: 52.237,
@@ -150,61 +241,72 @@ export default function App() {
           return (
             <Marker
               key={index}
-              coordinate={{
-                latitude: place.Latitude,
-                longitude: place.Longitude,
-              }}
+              coordinate={{ latitude: place.Latitude, longitude: place.Longitude }}
               title={`${style.emoji} ${place.Name}`}
+              onPress={() => {
+                setSelectedIndex(index);
+                setPinnedPlace(place); // collapse to single card
+                focusMapOn(place.Latitude, place.Longitude);
+                // (no need to scroll now)
+              }}
             />
           );
         })}
       </MapView>
 
-      {/* Filters & List */}
-      <ScrollView style={styles.filters}>
-        <Text style={styles.label}>Filtruj według kategorii:</Text>
-        <Picker
-          selectedValue={categoryFilter}
-          onValueChange={(value) => setCategoryFilter(value)}
-        >
-          <Picker.Item label="Wszystkie" value="" />
-          <Picker.Item label="Meczet" value="Meczet" />
-          <Picker.Item label="Restauracja" value="Restauracja" />
-          <Picker.Item label="Sklep" value="Sklep" />
-          <Picker.Item label="Cmentarz" value="Cmentarz" />
-        </Picker>
+      <View style={styles.listPane}>
+        {pinnedPlace ? (
+          <SingleCard />
+        ) : (
+          <FlatList
+            ref={listRef}
+            onLayout={({ nativeEvent }) => setListHeight(nativeEvent.layout.height)}
+            data={filteredPlaces}
+            keyExtractor={(_, i) => String(i)}
+            ListHeaderComponent={ListHeader}
+            contentContainerStyle={styles.listContent}
+            renderItem={({ item: place, index }) => {
+              const style = categoryStyle[place.Category] || {};
+              const distanceStr =
+                place.distance !== undefined ? ` (${place.distance.toFixed(1)} km)` : '';
+              const isFav = favourites.includes(place.Name);
+              return (
+                <TouchableOpacity
+                  onLayout={({ nativeEvent }) => {
+                    itemHeights.current[index] = nativeEvent.layout.height;
+                  }}
+                  style={[
+                    styles.listItem,
+                    selectedIndex === index && styles.listItemSelected,
+                  ]}
+                  onPress={() => {
+                    setSelectedIndex(index);
+                    setPinnedPlace(place); // pin from list
+                    focusMapOn(place.Latitude, place.Longitude);
+                  }}
+                >
+                  <View style={styles.textContainer}>
+                    <Text style={styles.placeName} numberOfLines={1} ellipsizeMode="tail">
+                      {style.emoji} {place.Name}
+                    </Text>
+                    <Text style={{ color: '#666' }} numberOfLines={1} ellipsizeMode="tail">
+                      {place.Category}
+                      {distanceStr}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => toggleFavourite(place.Name)}>
+                    <Text style={{ fontSize: 20 }}>{isFav ? '⭐' : '☆'}</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              );
+            }}
+            initialNumToRender={16}
+            windowSize={10}
+            removeClippedSubviews
+          />
+        )}
+      </View>
 
-        <Text style={styles.label}>
-          {showFavourites ? 'Ulubione miejsca:' : 'Lista miejsc:'}
-        </Text>
-        {filteredPlaces.map((place, index) => {
-          const style = categoryStyle[place.Category] || {};
-          const distanceStr =
-            place.distance !== undefined
-              ? ` (${place.distance.toFixed(1)} km)`
-              : '';
-          const isFav = favourites.includes(place.Name);
-
-          return (
-            <View key={index} style={styles.listItem}>
-              <View style={styles.textContainer}>
-                <Text style={styles.placeName}>
-                  {style.emoji} {place.Name}
-                </Text>
-                <Text style={{ color: '#666' }}>
-                  {place.Category}
-                  {distanceStr}
-                </Text>
-              </View>
-              <TouchableOpacity onPress={() => toggleFavourite(place.Name)}>
-                <Text style={{ fontSize: 20 }}>{isFav ? '⭐' : '☆'}</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </ScrollView>
-
-      {/* Modal Menu */}
       <Modal
         visible={menuVisible}
         animationType="slide"
@@ -232,10 +334,8 @@ export default function App() {
             >
               <Text style={styles.menuText}>⭐ Ulubione miejsca</Text>
             </TouchableOpacity>
-            <View style={styles.divider} />
-            <Text style={styles.suggestionText}>
-              Znasz miejsce, którego tu nie ma?
-            </Text>
+            <View className="divider" style={styles.divider} />
+            <Text style={styles.suggestionText}>Znasz miejsce, którego tu nie ma?</Text>
             <TouchableOpacity
               style={styles.suggestionButton}
               onPress={() =>
@@ -256,25 +356,14 @@ export default function App() {
   );
 }
 
-// 🎨 STYLES
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: Dimensions.get('window').width,
-    height: '50%',
-  },
-  filters: {
-    padding: 10,
-    backgroundColor: '#fff',
-    height: '50%',
-  },
-  label: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-    marginTop: 10,
-  },
+  container: { flex: 1 },
+  map: { width: Dimensions.get('window').width, height: '50%' },
+  listPane: { height: '50%', backgroundColor: '#fff' },
+  listContent: { paddingHorizontal: 10, paddingBottom: 16 },
+  headerWrap: { paddingTop: 10 },
+  label: { fontWeight: 'bold', marginBottom: 5, marginTop: 10 },
+  listItemSelected: { backgroundColor: '#eef6ff', borderRadius: 8 },
   listItem: {
     marginBottom: 10,
     borderBottomWidth: 1,
@@ -282,16 +371,20 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
-  textContainer: {
-    flex: 1,
-    paddingRight: 10,
+  textContainer: { flex: 1, paddingRight: 10 },
+  placeName: { fontSize: 16 },
+  backButton: {
+    marginTop: 10,
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
   },
-  placeName: {
-    fontSize: 16,
-    flexWrap: 'wrap',
-  },
+  backButtonText: { fontWeight: '600' },
   menuButton: {
     position: 'absolute',
     top: 40,
@@ -301,47 +394,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 6,
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: '#00000055',
-  },
+  modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: '#00000055' },
   modalContent: {
     backgroundColor: '#fff',
     padding: 20,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
-  menuTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  menuItem: {
-    paddingVertical: 10,
-  },
-  menuText: {
-    fontSize: 16,
-  },
-  divider: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginVertical: 15,
-  },
-  suggestionText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
+  menuTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  menuItem: { paddingVertical: 10 },
+  menuText: { fontSize: 16 },
+  divider: { borderBottomWidth: 1, borderBottomColor: '#ddd', marginVertical: 15 },
+  suggestionText: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 8 },
   suggestionButton: {
     backgroundColor: '#e74c3c',
     borderRadius: 8,
     padding: 10,
     alignItems: 'center',
   },
-  suggestionButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  suggestionButtonText: { color: '#fff', fontWeight: 'bold' },
 });
