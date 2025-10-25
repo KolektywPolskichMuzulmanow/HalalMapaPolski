@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "470818957",
+    "project_id": "halal-polski-map",
+    "storage_bucket": "halal-polski-map.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470818957:android:46cb8304c40bf2c13ec2c4",
+        "android_client_info": {
+          "package_name": "com.kpm.halalmap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuaQq3WGo7lJa7g4yRmsSg0eWrmaiOIQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
