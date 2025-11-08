@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "halal-mapa-polski2",
+    "name": "Halal Mapa Polski",
     "slug": "snack-fd3f5570-26e1-4efb-bc79-a75cd41b9049",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,17 +8,21 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
        },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.temp.halalmapapolski",
+      "config": {
+        "googleMapsApiKey": "YOUR_IOS_MAPS_KEY"
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We use your location to show halal places near you."
-      }
+      } 
     },
-      "android": {
+     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
@@ -28,15 +32,16 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
-      "package": "com.hubert_tomecki.snackfd3f557026e14efbbc79a75cd41b9049"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_ANDROID_MAPS_KEY"
+        }
+      },
+      "package": "com.temp.halalmapapolski"
     },
     "plugins": [
       "expo-font",
-      "expo-location",
-      "expo-maps"
+      "expo-location"
     ],
     "extra": {
       "eas": {
