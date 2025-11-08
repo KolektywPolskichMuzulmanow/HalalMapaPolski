@@ -45,9 +45,8 @@ export default function App() {
   const mapRef = useRef(null);
   const listRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [pinnedPlace, setPinnedPlace] = useState(null); // NEW: show single place when set
+  const [pinnedPlace, setPinnedPlace] = useState(null);
 
-  // Dynamic layout tracking (kept for full list mode)
   const itemHeights = useRef({});
   const [headerHeight, setHeaderHeight] = useState(0);
   const [listHeight, setListHeight] = useState(0);
@@ -67,21 +66,20 @@ export default function App() {
     }
   };
 
-  const getCumulativeHeight = (index) => {
-    let sum = 0;
-    for (let i = 0; i <= index; i++) {
-      const h = itemHeights.current[i];
-      sum += typeof h === 'number' ? h : DEFAULT_ITEM_HEIGHT;
+  const centerOnMe = async () => {
+    try {
+      if (!userLocation) {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') return;
+        const loc = await Location.getCurrentPositionAsync({});
+        setUserLocation(loc.coords);
+        focusMapOn(loc.coords.latitude, loc.coords.longitude);
+      } else {
+        focusMapOn(userLocation.latitude, userLocation.longitude);
+      }
+    } catch (e) {
+      console.warn('Could not center on user', e);
     }
-    return sum;
-  };
-
-  const focusListOnIndex = (index) => {
-    if (!listRef.current || typeof index !== 'number') return;
-    const cumulative = getCumulativeHeight(index);
-    let target = headerHeight + cumulative - listHeight + LIST_BOTTOM_PADDING;
-    if (target < 0) target = 0;
-    listRef.current.scrollToOffset({ offset: target, animated: true });
   };
 
   useEffect(() => {
@@ -160,11 +158,9 @@ export default function App() {
 
     setFilteredPlaces(data);
 
-    // If pinned place no longer exists in filtered set, clear pin
     if (pinnedPlace && !data.some((d) => d.Name === pinnedPlace.Name)) {
       setPinnedPlace(null);
     }
-    // Reset measured heights for full list mode
     itemHeights.current = {};
   }, [categoryFilter, places, userLocation, favourites, showFavourites]);
 
@@ -221,10 +217,21 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* Menu button */}
       <TouchableOpacity style={styles.menuButton} onPress={() => setMenuVisible(true)}>
         <Ionicons name="menu" size={28} color="#000" />
       </TouchableOpacity>
 
+      {/* Custom "My Location" button */}
+      <TouchableOpacity
+        style={styles.locationButton}
+        onPress={centerOnMe}
+        accessibilityLabel="Go to my location"
+      >
+        <Ionicons name="locate" size={26} color="#000" />
+      </TouchableOpacity>
+
+      {/* MapView */}
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -235,6 +242,7 @@ export default function App() {
           longitudeDelta: 3,
         }}
         showsUserLocation={true}
+        showsMyLocationButton={false}  // 👈 Hides default Android location button
       >
         {filteredPlaces.map((place, index) => {
           const style = categoryStyle[place.Category] || { emoji: '📍' };
@@ -245,15 +253,15 @@ export default function App() {
               title={`${style.emoji} ${place.Name}`}
               onPress={() => {
                 setSelectedIndex(index);
-                setPinnedPlace(place); // collapse to single card
+                setPinnedPlace(place);
                 focusMapOn(place.Latitude, place.Longitude);
-                // (no need to scroll now)
               }}
             />
           );
         })}
       </MapView>
 
+      {/* List */}
       <View style={styles.listPane}>
         {pinnedPlace ? (
           <SingleCard />
@@ -281,7 +289,7 @@ export default function App() {
                   ]}
                   onPress={() => {
                     setSelectedIndex(index);
-                    setPinnedPlace(place); // pin from list
+                    setPinnedPlace(place);
                     focusMapOn(place.Latitude, place.Longitude);
                   }}
                 >
@@ -307,6 +315,7 @@ export default function App() {
         )}
       </View>
 
+      {/* Modal menu */}
       <Modal
         visible={menuVisible}
         animationType="slide"
@@ -389,6 +398,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     left: 15,
+    zIndex: 999,
+    backgroundColor: '#ffffffcc',
+    borderRadius: 8,
+    padding: 6,
+  },
+  locationButton: {
+    position: 'absolute',
+    top: 40,
+    right: 15,
     zIndex: 999,
     backgroundColor: '#ffffffcc',
     borderRadius: 8,
