@@ -8,9 +8,11 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { ReactNativeLegal } from 'react-native-legal';
 import * as Papa from 'papaparse';
 import { Picker } from '@react-native-picker/picker';
 import { getDistance } from 'geolib';
@@ -39,6 +41,8 @@ export default function App() {
   const [favourites, setFavourites] = useState([]);
   const [showFavourites, setShowFavourites] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [aboutVisible, setAboutVisible] = useState(false);
+  const [privacyVisible, setPrivacyVisible] = useState(false);
 
   const FAV_KEY = 'favouritesList';
 
@@ -215,6 +219,174 @@ export default function App() {
     );
   };
 
+
+const AboutMe = () => (
+  <View style={styles.sheet}>
+    <Text style={styles.menuTitle}>O aplikacji</Text>
+
+    <ScrollView style={{ maxHeight: 360 }}>
+      <Text style={{ fontSize: 14, lineHeight: 20 }}>
+        
+        Halal Mapa Polski — v1.0.0{'\n'}
+        Copyright © 2025 Kolektyw Polskich Muzułmanów{'\n\n'}
+
+        Ten program jest wolnym oprogramowaniem: możesz go rozprowadzać dalej i/lub modyfikować
+        na warunkach Powszechnej Licencji Publicznej GNU, wydanej przez Free Software Foundation,
+        w wersji 3 tej Licencji lub (według twojego wyboru) dowolnej późniejszej wersji.{'\n\n'}
+
+        Ten program jest rozpowszechniany z nadzieją, że będzie użyteczny,
+        ale BEZ JAKIEJKOLWIEK GWARANCJI; nawet bez domniemanej gwarancji
+        PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONEGO CELU.
+        Więcej szczegółów znajdziesz w Powszechnej Licencji Publicznej GNU.{'\n\n'}
+
+        Kopia Powszechnej Licencji Publicznej GNU powinna być dołączona do tego programu.
+        Jeśli nie, zobacz: &lt;https://www.gnu.org/licenses/&gt;{'\n\n'}
+        
+        Wszystkie oryginalne projekty wizualne, układy, elementy brandingu, nazwa
+        "Halal Mapa Polski" i kompozycje prezentowane w tej aplikacji są objęte prawami
+        autorskimi © 2025 Kolektyw Polskich Muzułmanów.{'\n\n'}
+
+        Niektóre materiały wizualne w tej aplikacji zawierają zasoby licencjonowane od
+        zewnętrznych dostawców, takich jak Depositphotos. Materiały te zostały
+        zmodyfikowane i zintegrowane z oryginalnymi dziełami pochodnymi stworzonymi przez
+        Kolektyw Polskich Muzułmanów. Prawa autorskie do oryginalnych materiałów
+        stockowych należą do ich odpowiednich właścicieli; prawa autorskie do kompozycji
+        pochodnych należą do Kolektyw Polskich Muzułmanów.{'\n\n'}
+
+        Niektóre elementy projektu (takie jak ikony, obrazy i szablony) pochodzą z serwisu
+        Canva i są wykorzystywane na podstawie licencji Canva Free Content License i/lub
+        licencji Pro Content License, w zależności od przypadku. Elementy te pozostają
+        własnością intelektualną ich twórców i licencjodawców.{'\n\n'}
+
+        EN {'\n\n'}
+        Halal Mapa Polski — v1.0.0{'\n'}
+        Copyright © 2025 Kolektyw Polskich Muzułmanów{'\n\n'}
+
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.{'\n\n'}
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+        General Public License for more details.{'\n\n'}
+
+        You should have received a copy of the GNU General Public License
+        along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.{'\n\n'}
+
+        Images, the application name "Halal Mapa Polski", and other branding
+        elements are the property of Kolektyw Polskich Muzułmanów.
+        They are not covered by the GPL license and may not be reused
+        without permission from their rightful owner.{'\n\n'}
+
+        All original visual designs, layouts, branding elements, name "Halal Mapa Polski"
+        and compositions presented in this app are © 2025 Kolektyw Polskich Muzułmanów.
+        They are not covered by the GPL license and may not be reused without permission
+        from their rightful owner.{'\n\n'}
+
+        Some visual materials within this app incorporate assets licensed from third-party
+        providers such as Depositphotos. These materials have been modified and integrated
+        into original derivative works created by Kolektyw Polskich Muzułmanów. Copyright
+        in the original stock materials remains with their respective owners; copyright in
+        the derivative compositions belongs to Kolektyw Polskich Muzułmanów.{'\n\n'}
+
+        Certain design elements (such as icons, images, and templates) were sourced from'
+        Canva and are used under Canva’s Free Content License and/or Pro Content License,
+        as applicable. These elements remain the intellectual property of their respective
+        creators and licensors.{'\n\n'}
+
+      </Text>
+    </ScrollView>
+
+    {/* Source code link */}
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() =>
+        Linking.openURL('https://github.com/KolektywPolskichMuzulmanow/HalalMapaPolski')
+      }>
+      <Text
+        style={[
+          styles.menuText,
+          { textDecorationLine: 'underline', marginTop: 8 },
+        ]}>
+        Kod źródłowy aplikacji
+      </Text>
+    </TouchableOpacity>
+
+    {/* Full GPL text link (external) */}
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() => Linking.openURL('https://www.gnu.org/licenses/gpl-3.0.txt')}>
+      <Text
+        style={[
+          styles.menuText,
+          { textDecorationLine: 'underline', marginTop: 8 },
+        ]}>
+        Pełny tekst licencji GPL-3.0
+      </Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() =>
+        ReactNativeLegal.launchLicenseListScreen('Licencje open-source')
+      }>
+      <Text
+        style={[
+          styles.menuText,
+          { textDecorationLine: 'underline', marginTop: 15 },
+        ]}>
+        Pokaż licencje open-source
+      </Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={() => {
+        setAboutVisible(false);
+        setPrivacyVisible(true);
+      }}>
+      <Text
+        style={[
+          styles.menuText,
+          { textDecorationLine: 'underline', marginTop: 8 },
+        ]}>
+        Polityka prywatności
+      </Text>
+    </TouchableOpacity>
+
+    <Pressable onPress={() => setAboutVisible(false)}>
+      <Text
+        style={{
+          marginTop: 20,
+          textAlign: 'center',
+          color: '#888',
+        }}>
+        Zamknij
+      </Text>
+    </Pressable>
+  </View>
+);
+
+  const PrivacyPolicy = () => (
+    <View style={styles.sheet}>
+      <Text style={styles.menuTitle}>Polityka prywatności</Text>
+      <ScrollView style={{maxHeight: 360}}>
+        <Text style={{fontSize: 14, lineHeight: 20}}>
+          Aplikacja nie zbiera, nie przechowuje ani nie przetwarza żadnych danych osobowych użytkowników.{'\n\n'}
+          Aplikacja wykorzystuje komponent Google Maps SDK, który może przetwarzać dane, takie jak adres
+          IP lub dane o lokalizacji, w celu prawidłowego wyświetlania map.
+          Dane te są przetwarzane bezpośrednio przez firmę Google LLC zgodnie z ich Polityką Prywatności:
+          &lt;https://policies.google.com/privacy&gt;
+        </Text>
+      </ScrollView>
+      <Pressable onPress={() => setPrivacyVisible(false)}>
+        <Text style={{ marginTop: 20, textAlign: 'center', color: '#888' }}>Zamknij</Text>
+      </Pressable>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       {/* Menu button */}
@@ -276,7 +448,7 @@ export default function App() {
             renderItem={({ item: place, index }) => {
               const style = categoryStyle[place.Category] || {};
               const distanceStr =
-                place.distance !== undefined ? ` (${place.distance.toFixed(1)} km)` : '';
+                place.distance !== undefined ? ` ({place.distance.toFixed(1)} km)` : '';
               const isFav = favourites.includes(place.Name);
               return (
                 <TouchableOpacity
@@ -353,11 +525,46 @@ export default function App() {
             >
               <Text style={styles.suggestionButtonText}>Zaproponuj miejsce</Text>
             </TouchableOpacity>
-            <Pressable onPress={() => setMenuVisible(false)}>
+            <TouchableOpacity
+  style={[styles.suggestionButton, { backgroundColor: '#2ecc71', marginTop: 10 }]}
+  onPress={() => { setMenuVisible(false); setAboutVisible(true); }}
+>
+  <Text style={styles.suggestionButtonText}>O aplikacji</Text>
+</TouchableOpacity>
+
+<Pressable onPress={() => setMenuVisible(false)}>
               <Text style={{ marginTop: 20, textAlign: 'center', color: '#888' }}>
                 Zamknij
               </Text>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* About modal */}
+      <Modal
+        visible={aboutVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setAboutVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <AboutMe />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Privacy modal */}
+      <Modal
+        visible={privacyVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setPrivacyVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <PrivacyPolicy />
           </View>
         </View>
       </Modal>
@@ -431,4 +638,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   suggestionButtonText: { color: '#fff', fontWeight: 'bold' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  sheet: {
+    backgroundColor: '#fff',
+  },
 });
+
