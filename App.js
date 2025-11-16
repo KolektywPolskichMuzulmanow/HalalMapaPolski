@@ -335,7 +335,7 @@ const AboutMe = () => (
       <Text
         style={[
           styles.menuText,
-          { textDecorationLine: 'underline', marginTop: 15 },
+          { textDecorationLine: 'underline', marginTop: 8 },
         ]}>
         Pokaż licencje open-source
       </Text>
@@ -448,7 +448,7 @@ const AboutMe = () => (
             renderItem={({ item: place, index }) => {
               const style = categoryStyle[place.Category] || {};
               const distanceStr =
-                place.distance !== undefined ? ` ({place.distance.toFixed(1)} km)` : '';
+                place.distance !== undefined ? ` (${place.distance.toFixed(1)} km)` : '';
               const isFav = favourites.includes(place.Name);
               return (
                 <TouchableOpacity
