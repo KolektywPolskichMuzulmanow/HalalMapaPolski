@@ -227,7 +227,7 @@ const AboutMe = () => (
     <ScrollView style={{ maxHeight: 360 }}>
       <Text style={{ fontSize: 14, lineHeight: 20 }}>
         
-        Halal Mapa Polski — v1.0.0{'\n'}
+        Halal Mapa Polski — v0.1.0{'\n'}
         Copyright © 2025 Kolektyw Polskich Muzułmanów{'\n\n'}
 
         Ten program jest wolnym oprogramowaniem: możesz go rozprowadzać dalej i/lub modyfikować
@@ -244,7 +244,8 @@ const AboutMe = () => (
         
         Wszystkie oryginalne projekty wizualne, układy, elementy brandingu, nazwa
         "Halal Mapa Polski" i kompozycje prezentowane w tej aplikacji są objęte prawami
-        autorskimi © 2025 Kolektyw Polskich Muzułmanów.{'\n\n'}
+        autorskimi © 2025 Kolektyw Polskich Muzułmanów. Nie są one objęte Powszechną
+        Licencją Publiczną GNU i nie mogą być wykorzystywane bez zgody właściciela.{'\n\n'}
 
         Niektóre materiały wizualne w tej aplikacji zawierają zasoby licencjonowane od
         zewnętrznych dostawców, takich jak Depositphotos. Materiały te zostały
@@ -258,8 +259,12 @@ const AboutMe = () => (
         licencji Pro Content License, w zależności od przypadku. Elementy te pozostają
         własnością intelektualną ich twórców i licencjodawców.{'\n\n'}
 
+        Ta aplikacja wykożystuje Google Maps SDK for Android/iOS © Google LLC. Wykorzystywane
+        na podstawie licencji. Dane i obrazy map Google podlegają Warunkom korzystania z
+        usług Google.{'\n\n'}
+
         EN {'\n\n'}
-        Halal Mapa Polski — v1.0.0{'\n'}
+        Halal Mapa Polski — v0.1.0{'\n'}
         Copyright © 2025 Kolektyw Polskich Muzułmanów{'\n\n'}
 
         This program is free software: you can redistribute it and/or modify
@@ -275,15 +280,10 @@ const AboutMe = () => (
         You should have received a copy of the GNU General Public License
         along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.{'\n\n'}
 
-        Images, the application name "Halal Mapa Polski", and other branding
-        elements are the property of Kolektyw Polskich Muzułmanów.
-        They are not covered by the GPL license and may not be reused
-        without permission from their rightful owner.{'\n\n'}
-
         All original visual designs, layouts, branding elements, name "Halal Mapa Polski"
-        and compositions presented in this app are © 2025 Kolektyw Polskich Muzułmanów.
-        They are not covered by the GPL license and may not be reused without permission
-        from their rightful owner.{'\n\n'}
+        and compositions presented in this app are copyrighted by © 2025 Kolektyw Polskich
+        Muzułmanów. They are not covered by the GPL license and may not be reused without
+        permission from their rightful owner.{'\n\n'}
 
         Some visual materials within this app incorporate assets licensed from third-party
         providers such as Depositphotos. These materials have been modified and integrated
@@ -291,10 +291,13 @@ const AboutMe = () => (
         in the original stock materials remains with their respective owners; copyright in
         the derivative compositions belongs to Kolektyw Polskich Muzułmanów.{'\n\n'}
 
-        Certain design elements (such as icons, images, and templates) were sourced from'
+        Certain design elements (such as icons, images, and templates) were sourced from
         Canva and are used under Canva’s Free Content License and/or Pro Content License,
         as applicable. These elements remain the intellectual property of their respective
         creators and licensors.{'\n\n'}
+
+        This app uses Google Maps SDK for Android/iOS © Google LLC. Used under license. Google
+        Maps data and imagery are subject to Google’s Terms of Service.{'\n\n'}
 
       </Text>
     </ScrollView>
@@ -375,9 +378,19 @@ const AboutMe = () => (
       <ScrollView style={{maxHeight: 360}}>
         <Text style={{fontSize: 14, lineHeight: 20}}>
           Aplikacja nie zbiera, nie przechowuje ani nie przetwarza żadnych danych osobowych użytkowników.{'\n\n'}
+          
           Aplikacja wykorzystuje komponent Google Maps SDK, który może przetwarzać dane, takie jak adres
           IP lub dane o lokalizacji, w celu prawidłowego wyświetlania map.
           Dane te są przetwarzane bezpośrednio przez firmę Google LLC zgodnie z ich Polityką Prywatności:
+          &lt;https://policies.google.com/privacy&gt;
+
+          EN{'\n\n'}
+
+          The application does not collect, store, or process any personal data of its users.{'\n\n'}
+
+          The application uses the Google Maps SDK component, which may process data such as an IP address or
+          location information in order to display maps correctly. This data is processed directly by Google LLC
+          in accordance with their Privacy Policy:
           &lt;https://policies.google.com/privacy&gt;
         </Text>
       </ScrollView>

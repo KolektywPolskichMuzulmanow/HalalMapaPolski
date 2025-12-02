@@ -3,7 +3,7 @@ export default ({ config }) => ({
   expo: {
     name: "Halal Mapa Polski",
     slug: "snack-fd3f5570-26e1-4efb-bc79-a75cd41b9049",
-    version: "1.0.0",
+    version: "0.1.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -15,7 +15,7 @@ export default ({ config }) => ({
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.temp.halalmapapolski",
+      bundleIdentifier: "pl.kolektywmuzulmanow.halalmapapolski",
       config: {
         googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_KEY || "YOUR_IOS_MAPS_KEY",
       },
@@ -36,7 +36,7 @@ export default ({ config }) => ({
           apiKey: process.env.GOOGLE_MAPS_ANDROID_KEY || "YOUR_ANDROID_MAPS_KEY",
         },
       },
-      package: "com.temp.halalmapapolski",
+      package: "pl.kolektywmuzulmanow.halalmapapolski",
     },
     plugins: ["expo-font", "expo-location", "react-native-legal"],
     extra: {
