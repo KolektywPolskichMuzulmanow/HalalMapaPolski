@@ -377,8 +377,16 @@ const AboutMe = () => (
       <Text style={styles.menuTitle}>Polityka prywatności</Text>
       <ScrollView style={{maxHeight: 360}}>
         <Text style={{fontSize: 14, lineHeight: 20}}>
-          Aplikacja nie zbiera, nie przechowuje ani nie przetwarza żadnych danych osobowych użytkowników.{'\n\n'}
           
+          Pełna polityka prywatności / full privacy policy: 
+          &lt;https://github.com/KolektywPolskichMuzulmanow/HalalMapaPolski/blob/main/public/privacy-policy.md&gt;
+
+          PL{'\n\n'}
+
+          Aplikacja nie zbiera, nie przechowuje ani nie przetwarza żadnych danych osobowych użytkowników.
+          Dane lokalizacyjne (jeśli użytkownik wyrazi zgodę) są wykorzystywane wyłącznie na urządzeniu w
+          celu prawidłowego działania funkcji aplikacji i nie są nigdzie wysyłane przez twórców aplikacji.{'\n\n'}
+
           Aplikacja wykorzystuje komponent Google Maps SDK, który może przetwarzać dane, takie jak adres
           IP lub dane o lokalizacji, w celu prawidłowego wyświetlania map.
           Dane te są przetwarzane bezpośrednio przez firmę Google LLC zgodnie z ich Polityką Prywatności:
@@ -386,12 +394,16 @@ const AboutMe = () => (
 
           EN{'\n\n'}
 
-          The application does not collect, store, or process any personal data of its users.{'\n\n'}
+          The application does not collect, store, or process any personal data of its users.
+          Location data (if the user grants permission) is used only on the device to provide the app’s
+          functionality and is not transmitted by the app developers.{'\n\n'}
 
           The application uses the Google Maps SDK component, which may process data such as an IP address or
           location information in order to display maps correctly. This data is processed directly by Google LLC
           in accordance with their Privacy Policy:
           &lt;https://policies.google.com/privacy&gt;
+
+          
         </Text>
       </ScrollView>
       <Pressable onPress={() => setPrivacyVisible(false)}>
